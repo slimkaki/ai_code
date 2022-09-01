@@ -11,6 +11,8 @@ class VacuumWorldGeneric(State):
         self.row = row
         self.col = col
         self.operator = op
+        self.height = len(self.mapa)
+        self.width = len(self.mapa[0])
 
     def env(self):
         s = ""
@@ -30,10 +32,13 @@ class VacuumWorldGeneric(State):
         sucessors = []
 
         newMapa = []
-        for i in range(len(self.mapa)):
-            newMapa.append(self.mapa[i].copy())
+        for i in range(self.height):
+            if (i == self.row):
+                newMapa.append(self.mapa[i].copy())
+                newMapa[self.row][self.col] = False
+                continue
+            newMapa.append(self.mapa[i])
 
-        newMapa[self.row][self.col] = False
         sucessors.append(VacuumWorldGeneric(newMapa, self.row, self.col, "limpar"))
 
         if (self.row == 0):
@@ -41,7 +46,7 @@ class VacuumWorldGeneric(State):
         else:
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row-1, self.col, "Move Up"))
 
-        if (self.row == len(self.mapa)-1):
+        if (self.row == self.height - 1):
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row, self.col, "Move Down"))
         else:
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row+1, self.col, "Move Down"))
@@ -51,7 +56,7 @@ class VacuumWorldGeneric(State):
         else:
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row, self.col-1, "Move Left"))
 
-        if (self.col == len(self.mapa[0])-1):
+        if (self.col == self.width - 1):
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row, self.col, "Move Right"))
         else:
             sucessors.append(VacuumWorldGeneric(self.mapa, self.row, self.col+1, "Move Right"))
@@ -62,8 +67,9 @@ class VacuumWorldGeneric(State):
         return str(self.operator)
 
     def is_goal(self):
-        for r in self.mapa:
-            if any(r):
+        it = iter(self.mapa)
+        for i in it:
+            if (any(i)):
                 return False
         return True
 
@@ -104,6 +110,18 @@ def main2():
     print(f'Solução = {result.show_path()}')
     print('\n')
 
+def main3():
+    print('\n#### Largura Simples 4 ####')
+    file_map_path = 'data/vacuum_simple_4.txt'
+    lin = 0
+    col = 0
+    mapa = convert_file_to_map(file_map_path)
+    state = VacuumWorldGeneric(mapa, lin, col, '')
+    algorithm = BuscaLargura()
+    result = algorithm.search(state)
+    print(f'Solução = {result.show_path()}')
+    print('\n')
+
 def exemplo3():
     print('\n#### Largura Simples 2 ####')
     file_map_path = 'data/example_2.txt'
@@ -118,4 +136,4 @@ def exemplo3():
     print('\n')
 
 if __name__ == '__main__':
-    exemplo3()
+    main2()
