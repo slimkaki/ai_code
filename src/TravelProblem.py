@@ -1,22 +1,28 @@
-from aicode.search.SearchAlgorithms import BuscaLargura
+from mimetypes import init
+from aicode.search.SearchAlgorithms import BuscaLargura, BuscaCustoUniforme
 from aicode.search.Graph import State
 
 class TravellerProblem(State):
 
-    def __init__(self, mapa, actualCity, goalCity, op):
+    def __init__(self, mapa, actualCity, goalCity, visited, op):
         self.mapa = mapa
         self.actualCity = actualCity
         self.goalCity = goalCity
         self.operator = op
+        self.visited = visited
     
     def sucessors(self):
         sucessors = []
 
         for city in self.mapa[self.actualCity]:
-            sucessors.append(TravellerProblem(self.mapa, 
-                                              city[1], 
-                                              self.goalCity, 
-                                              "move to " + city[1]))
+            if (city not in self.visited):
+                v = self.visited.copy()
+                v.add(city)
+                sucessors.append(TravellerProblem(self.mapa, 
+                                 city[1], 
+                                 self.goalCity,
+                                 v, 
+                                 "move to " + city[1]))
 
         return sucessors
     
@@ -30,7 +36,7 @@ class TravellerProblem(State):
         for city in self.mapa[self.actualCity]:
             if city[1] == self.operator.split()[-1]:
                 return city[0]
-        return 0
+        return 1
 
 
     def print(self):
@@ -82,10 +88,12 @@ def createArea():
         }
     return mapa
 
-def main():
+def main_buscaLargura():
     print('Busca em largura')
     mapa = createArea()
-    state = TravellerProblem(mapa, "i", "o", '')
+    initial, goal = "i", "o"
+    visited = set(initial)
+    state = TravellerProblem(mapa, initial, goal, visited, '')
     algorithm = BuscaLargura()
     result = algorithm.search(state)
     if result != None:
@@ -94,5 +102,22 @@ def main():
     else:
         print('Nao achou solucao')
 
+def main_buscaCustoUniforme():
+    print('Busca de Custo Uniforme')
+    mapa = createArea()
+    initial, goal = "i", "o"
+    visited = set(initial)
+    state = TravellerProblem(mapa, initial, goal, visited, '')
+    algorithm = BuscaCustoUniforme()
+    result = algorithm.search(state)
+    if result != None:
+        print('Achou!')
+        print(result.show_path())
+    else:
+        print('Nao achou solucao')
+
+
 if __name__ == '__main__':
-    main()
+    main_buscaLargura()
+    print()
+    main_buscaCustoUniforme()
