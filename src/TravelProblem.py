@@ -91,7 +91,7 @@ def createArea():
 def main_buscaLargura():
     print('Busca em largura')
     mapa = createArea()
-    initial, goal = "i", "o"
+    initial, goal = "p", "n"
     visited = set(initial)
     state = TravellerProblem(mapa, initial, goal, visited, '')
     algorithm = BuscaLargura()
@@ -105,7 +105,7 @@ def main_buscaLargura():
 def main_buscaCustoUniforme():
     print('Busca de Custo Uniforme')
     mapa = createArea()
-    initial, goal = "i", "o"
+    initial, goal = "p", "n"
     visited = set(initial)
     state = TravellerProblem(mapa, initial, goal, visited, '')
     algorithm = BuscaCustoUniforme()

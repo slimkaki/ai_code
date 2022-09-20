@@ -7,34 +7,41 @@ import csv
 
 class Map(State):
 
-    def __init__(self):
-        #TODO
-        pass
+    def __init__(self, actualCity, goalCity, op):
+        self.actualCity = actualCity
+        self.goalCity = goalCity
+        self.operator = op
     
     def sucessors(self):
-        #TODO
-        pass
+        sucessors = []
+
+        for city in self.area[self.actualCity]:
+            sucessors.append(Map(city[1], 
+                                self.goalCity,
+                                "move to " + city[1]))
+
+        return sucessors
     
     def is_goal(self):
-        return (self.city == self.goal)
+        return self.actualCity == self.goalCity
     
     def description(self):
         return "The map of cities with road distances"
     
     def cost(self):
-        #TODO
-        return 0
+        for city in self.area[self.actualCity]:
+            if city[1] == self.operator.split()[-1]:
+                return city[0]
+        return 1
     
     def print(self):
         return str(self.operator)
     
     def env(self):
-        #TODO
-        return None
+        return self.actualCity + "#" + str(self.cost)
 
     def h(self):
-        #TODO
-        return 1
+        return int(Map.g.edges[self.actualCity, self.goalCity]["distance"])
 
     @staticmethod
     def createArea():
@@ -74,25 +81,48 @@ class Map(State):
             Map.g.add_edge(row[0],row[1], distance = row[2])
 
 
-def main():
+def mainAEstrela(initial, goal):
 
     Map.createArea()
     Map.createHeuristics()
 
-    print('Busca por algoritmo A*: sair de p e chegar em n')
-    state = Map('i', 0, 'i', 'x')
+    print(f'Busca por algoritmo A*: sair de {initial} e chegar em {goal}')
+    state = Map(initial, goal, '')
     algorithm = AEstrela()
     ts = time.time()
     result = algorithm.search(state)
     tf = time.time()
     if result != None:
         print(result.show_path())
+        print('O número de passos da solução é: ' + str(result.g))
+        print('O custo da solução é: ' + str(result.h()))
     else:
-        print('Nao achou solucao')
+        print('Não achou solução')
     print('Tempo de processamento em segundos: ' + str(tf-ts))
-    print('O custo da solucao eh: '+str(result.g))
     print('')
     
+def mainGanancioso(initial, goal):
+
+    Map.createArea()
+    Map.createHeuristics()
+
+    print(f'Busca por algoritmo Ganancioso: sair de {initial} e chegar em {goal}')
+    state = Map(initial, goal, '')
+    algorithm = BuscaGananciosa()
+    ts = time.time()
+    result = algorithm.search(state)
+    tf = time.time()
+    if result != None:
+        print(result.show_path())
+        print('O número de passos da solução é: ' + str(result.g))
+        print('O custo da solução é: ' + str(result.h()))
+    else:
+        print('Não achou solução')
+    print('Tempo de processamento em segundos: ' + str(tf-ts))
+    print('')
+
 
 if __name__ == '__main__':
-    main()
+    i, g = 'i', 'x'
+    mainAEstrela(i, g)
+    mainGanancioso(i, g)
